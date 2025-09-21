@@ -1,0 +1,52 @@
+from expyriment import design, control, stimuli
+#control.set_develop_mode()
+
+exp = design.Experiment(name = "twoSquare")
+
+control.initialize(exp)
+
+#initial
+square_size = (50, 50) #square size
+left_square = stimuli.Rectangle(size=square_size,colour= (255, 0, 0), position=(-400, 0)) #set colours and initial positions 
+right_square = stimuli.Rectangle(size = square_size, colour = (0, 255, 0), position = (0, 0))
+
+
+#movement
+step_size = 5       # distance for each movement
+frame_delay = 10    # 10ms for each stop
+n_steps = 70        # total steps = 400-50
+
+control.start()
+
+for i in range(n_steps):
+    
+    left_square.move((step_size, 0))#move the red square
+
+    
+    left_square.present(clear=True, update=False)  #draw left square without updating screen
+    right_square.present(clear=False, update=True)  #draw tight square, update screen
+
+    exp.clock.wait(frame_delay) #control the moving speed
+
+exp.clock.wait(50)# Maybe the delay should under 50ms to avoid the disruption of causality.
+
+#red square reaches the green square, green square moves to the right
+for i in range(n_steps):
+    
+    right_square.move((step_size, 0))
+
+    
+    right_square.present(clear=True, update=False)   
+    left_square.present(clear=False, update=True)  
+
+    exp.clock.wait(frame_delay)
+
+exp.clock.wait(1000) #Show this display for 1 second.
+exp.screen.clear()
+exp.screen.update()
+# Leave it on-screen until a key is pressed
+exp.keyboard.wait()
+
+
+# End the current session and quit expyriment
+control.end()

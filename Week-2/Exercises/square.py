@@ -1,5 +1,5 @@
 from expyriment import design, control, stimuli
-control.set_develop_mode()
+#control.set_develop_mode()
 
 exp = design.Experiment(name = "Square")
 

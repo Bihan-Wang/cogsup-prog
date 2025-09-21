@@ -1,9 +1,7 @@
 # Import the main modules of expyriment
 from expyriment import design, control, stimuli
 control.set_develop_mode()
-#control.defaults.initialise_delay = 0 # No countdown
-#control.defaults.window_mode = True # Not full-screen
-#control.defaults.fast_quit = True # No goodbye message
+
 # Create an object of class Experiment: This stores the global settings of your experiment & handles the data file, screen, and input devices
 exp = design.Experiment(name = "Circle")
 
