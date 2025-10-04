@@ -7,19 +7,20 @@ def load(stims):
 
 def timed_draw(stims):
     t0 = exp.clock.time
-    stims[0].present()
-    dt1 = exp.clock.time - t0
-    exp.clock.wait(1000-dt)
-
-    t1 = exp.clock.time
-    stims[1].present()
-    dt2 = exp.clock.time - t1
-    fix_duration = (t1 - t0)/1000
-    return fix_duration
+    if len(stims)> 0:
+        stims[0].present(clear=True, update = False)
+        for stim in stims[1:]:
+            stim.present(clear = False, update = False)
+        exp.screen.update()
+    dt = exp.clock.time - t0
+    return dt
     # return the time it took to draw
 
 def present_for(stims, t=1000):
-    pass
+    dt = timed_draw(stims)
+    remaining = t - dt
+    if remaining > 0:
+        exp.clock.wait(remaining)
 
 
 """ Test functions """
