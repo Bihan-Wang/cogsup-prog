@@ -1,0 +1,46 @@
+from expyriment import design, control, stimuli
+from expyriment.misc.constants import C_WHITE, C_BLACK
+
+""" Global settings """
+exp = design.Experiment(name="Blindspot", background_colour=C_WHITE, foreground_colour=C_BLACK)
+control.set_develop_mode()
+control.initialize(exp)
+
+""" Stimuli """
+def make_circle(r, pos=(0,0)):
+    c = stimuli.Circle(r, position=pos, anti_aliasing=10)
+    c.preload()
+    return c
+
+""" Adjustment """
+def adjust_circle(circle):
+    adjusting = True
+    step = 5 #the moving step
+    size_step = 3 #the step of size
+
+    while adjusting:
+        circle.present()
+        key, rt = exp.keyboard.wait(
+            keys=[K_DOWN, K_UP, K_LEFT, K_RIGHT, ord('1'), ord('2'), ord(' ')]
+        )
+        if key == K_DOWN:
+
+
+""" Experiment """
+def run_trial():
+    fixation = stimuli.FixCross(size=(150, 150), line_width=10, position=[300, 0])
+    fixation.preload()
+
+    radius = 75
+    circle = make_circle(radius)
+
+    fixation.present(True, False)
+    circle.present(False, True)
+
+    exp.keyboard.wait()
+
+control.start(subject_id=1)
+
+run_trial()
+    
+control.end()

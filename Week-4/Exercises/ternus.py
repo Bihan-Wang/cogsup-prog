@@ -93,7 +93,7 @@ def run_trial(isi_frames, use_tags):# display the information of parameters
 
 
 # Low ISI without color tag 
-run_trial(isi_frames=1,  use_tags=False)
+run_trial(isi_frames=0,  use_tags=False)
 # High ISI without color tag
 run_trial(isi_frames=12, use_tags=False)
 # high ISI with color tag
