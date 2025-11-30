@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My experiment</title>
+
+    
+    <script src="https://unpkg.com/jspsych@8.0.2"></script>
+    <link href="https://unpkg.com/jspsych@8.0.2/css/jspsych.css" rel="stylesheet" />
+
+    
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-survey-likert@2.0.0"></script>
+  </head>
+
+  <body></body>
+
+  
+  <script type="text/javascript">
+    const NUMBER_OF_TRIALS_PER_KEY = 10; 
+    const KEYS = ['F', 'J'];
+    const BLANK_DURATION = 50; // ms
+
+    
+    function createKeyPressTrial(targetKey, lowerCase, keys, blankDuration) {
+
+      //Display letter for 1 second
+      let stimulusDisplayTrial = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: lowerCase ? targetKey.toLowerCase() : targetKey.toUpperCase(),
+        choices: keys,
+        post_trial_gap: blankDuration,
+        trial_duration: 1000,
+        data: {
+          lowerCase: lowerCase,
+          targetKey: targetKey
+        },
+        on_finish: function(data){
+          data.actualKey = data.response;   // store what participant pressed
+        }
+      };
+
+      // Confidence rating slider
+      let confidenceTrial = {
+        type: jsPsychSurveyLikert,
+        questions: [{
+          prompt: "<p>How confident are you in your answer?</p>",
+          labels: ["0%", "25%", "50%", "75%", "100%"]
+        }],
+        data: {
+          trialType: "confidence_rating",
+          targetKey: targetKey,
+          lowerCase: lowerCase
+        },
+        on_finish: function(data){
+          data.confidence = data.response[0]; // Likert score 0-4
+        }
+      };
+
+      
+      return {
+        timeline: [stimulusDisplayTrial, confidenceTrial]
+      };
+    }
+
+    
+    function createShuffledListOfTrials(keys, trialsPerKey, blankDuration){
+      let possibleTrials = [];
+
+      for (let k = 0; k < keys.length; k++){
+        
+        for (let lowerCase of [true, false]){
+          possibleTrials.push(
+            createKeyPressTrial(keys[k], lowerCase, keys, blankDuration)
+          );
+        }
+      }
+
+      
+      return jsPsych.randomization.repeat(possibleTrials, trialsPerKey);
+    }
+  </script>
+
+  
+  <script type="text/javascript">
+    const jsPsych = initJsPsych({
+      on_finish: function(){
+        jsPsych.data.get().localSave("csv", "letter_experiment_results.csv");
+        document.body.innerHTML = "<p>Thank you for participating!</p>";
+      }
+    });
+
+    
+    const helloTrial = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <p>Hello!</p>
+        <p>You will take part in a simple experiment.</p>
+        <p>You will see a letter: either ${KEYS[0]} or ${KEYS[1]}.</p>
+        <p>Your job: press the corresponding key as fast as possible.</p>
+        <p>After each answer, you will rate your confidence.</p>
+        <p>Press any key to begin.</p>
+      `
+    };
+
+    
+    let trials = createShuffledListOfTrials(KEYS, NUMBER_OF_TRIALS_PER_KEY, BLANK_DURATION);
+
+    
+    let timeline = [helloTrial];
+
+    for (let trial of trials){
+      timeline.push(trial);
+    }
+
+    
+    jsPsych.run(timeline);
+  </script>
+</html>

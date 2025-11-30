@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My experiment</title>
+    <script src="https://unpkg.com/jspsych@8.0.2"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@2.0.0"></script>
+    <link href="https://unpkg.com/jspsych@8.0.2/css/jspsych.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body></body>
+
+  <script type="text/javascript">
+    
+    const jsPsych = initJsPsych({
+      on_finish: function () {
+        jsPsych.data.get().localSave("csv", "demo_jspsych_results.csv");
+        document.body.innerHTML = "<p>Thank you!</p>";
+      }
+    });
+
+    
+    const helloTrial = {
+      type: jsPsychHtmlKeyboardResponse,
+      stimulus: `
+        <p>Hello!</p>
+        <p>You will be taking part in a toy experiment.</p>
+        <p>You will see one of two letters displayed on the screen (F or J).</p>
+        <p>Your role is to press the key corresponding to the letter.</p>
+        <p>Please answer as fast as you can!</p>
+        <p>Press any key to continue.</p>
+      `,
+      choices: "ALL_KEYS"
+    };
+
+    
+    const KEYS = ['F', 'J'];
+    const NUMBER_OF_TRIALS_PER_KEY = 3;  
+
+    let trialsLetters = jsPsych.randomization.repeat(KEYS, NUMBER_OF_TRIALS_PER_KEY);
+    let trials = [];
+
+    for (let letter of trialsLetters) {
+      let trial = {
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: `
+          <p style="font-size:60px; text-align:center;">${letter}</p>
+        `,
+        choices: ['f', 'j'],  // 只接受 f/j
+        data: { correct_key: letter.toLowerCase() },
+        on_finish: function (data) {
+          data.correct = (data.response === data.correct_key);
+        }
+      };
+      trials.push(trial);
+    }
+
+    // timeline
+    let timeline = [helloTrial];
+
+    for (let trial of trials) {
+      timeline.push(trial);
+    }
+
+    
+    jsPsych.run(timeline);
+  </script>
+</html>
